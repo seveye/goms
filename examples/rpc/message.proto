@@ -1,0 +1,11 @@
+syntax = "proto3";
+package main;
+
+message AddReq {
+	uint64 a = 1;
+	uint64 b = 2;
+}
+
+message AddRsp {
+	uint64 c = 1;
+}

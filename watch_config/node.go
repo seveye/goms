@@ -12,7 +12,7 @@ import (
 	"fmt"
 	"strings"
 
-	"gitee.com/jkkkls/goms/watch"
+	"github.com/seveye/goms/watch"
 )
 
 const (
@@ -74,7 +74,7 @@ type ServiceInfo struct {
 	Func []*FunctionInfo `json:"func,omitempty"`
 }
 
-//节点注册函数
+// 节点注册函数
 type NodeInfo struct {
 	Id      uint64         `json:"id,omitempty"`
 	Name    string         `json:"name,omitempty"`    //
@@ -97,7 +97,7 @@ func GetAllRegisterNode(client *watch.WatchClient, set string) map[string]*NodeI
 	return m
 }
 
-//RegisterNode 注册节点和服务
+// RegisterNode 注册节点和服务
 func RegisterNode(client *watch.WatchClient, info *NodeInfo) {
 	//注册节点
 	key := fmt.Sprintf("%v:%v", NodeRegisterKey, info.Set)

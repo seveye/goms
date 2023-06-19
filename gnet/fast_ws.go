@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"time"
 
-	"gitee.com/jkkkls/goms/util"
 	"github.com/fasthttp/websocket"
+	"github.com/seveye/goms/util"
 )
 
 // WsConn2 websocket封装

@@ -11,7 +11,7 @@ import (
 	"sync"
 	"time"
 
-	"gitee.com/jkkkls/goms/util"
+	"github.com/seveye/goms/util"
 )
 
 // ServerError represents an error that has been returned from

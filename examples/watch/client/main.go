@@ -6,7 +6,7 @@ import (
 	"net/http"
 	_ "net/http/pprof"
 
-	"gitee.com/jkkkls/goms/watch"
+	"github.com/seveye/goms/watch"
 	// "time"
 )
 

@@ -6,7 +6,7 @@ import (
 	"strings"
 	"sync"
 
-	"gitee.com/jkkkls/goms/util/sys"
+	"github.com/seveye/goms/util/sys"
 )
 
 var threadMap sync.Map

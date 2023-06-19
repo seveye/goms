@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"strings"
 
-	"gitee.com/jkkkls/goms/rpc"
-	"gitee.com/jkkkls/goms/util"
 	routing "github.com/qiangxue/fasthttp-routing"
+	"github.com/seveye/goms/rpc"
+	"github.com/seveye/goms/util"
 	"github.com/valyala/fasthttp"
 )
 

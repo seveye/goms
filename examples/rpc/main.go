@@ -6,8 +6,8 @@ import (
 	"net"
 	"time"
 
-	"gitee.com/jkkkls/goms/rpc"
 	"github.com/golang/protobuf/proto"
+	"github.com/seveye/goms/rpc"
 )
 
 type User struct{}

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"gitee.com/jkkkls/goms/watch"
+	"github.com/seveye/goms/watch"
 	"net/http"
 	_ "net/http/pprof"
 )

@@ -3,10 +3,10 @@ package main
 import (
 	"sync"
 
-	"gitee.com/jkkkls/goms/util"
+	"github.com/seveye/goms/util"
 
-	"gitee.com/jkkkls/goms/examples/microservice/pb"
-	"gitee.com/jkkkls/goms/rpc"
+	"github.com/seveye/goms/examples/microservice/pb"
+	"github.com/seveye/goms/rpc"
 )
 
 // DbService

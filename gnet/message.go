@@ -7,8 +7,8 @@ import (
 	"errors"
 	"io"
 
-	"gitee.com/jkkkls/goms/util"
-	"gitee.com/jkkkls/goms/util/bytes_cache"
+	"github.com/seveye/goms/util"
+	"github.com/seveye/goms/util/bytes_cache"
 )
 
 // 通讯密钥

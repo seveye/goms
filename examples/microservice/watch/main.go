@@ -4,7 +4,7 @@ package main
 import (
 	"fmt"
 
-	"gitee.com/jkkkls/goms/watch"
+	"github.com/seveye/goms/watch"
 )
 
 func main() {

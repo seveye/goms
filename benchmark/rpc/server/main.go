@@ -6,8 +6,8 @@ import (
 
 	"github.com/google/gops/agent"
 
-	"gitee.com/jkkkls/goms/benchmark/rpc/proto"
-	"gitee.com/jkkkls/goms/rpc"
+	"github.com/seveye/goms/benchmark/rpc/proto"
+	"github.com/seveye/goms/rpc"
 )
 
 type User struct{}

@@ -17,10 +17,10 @@ import (
 	"syscall"
 	"time"
 
-	"gitee.com/jkkkls/goms/watch_config"
+	"github.com/seveye/goms/watch_config"
 
-	"gitee.com/jkkkls/goms/util"
-	"gitee.com/jkkkls/goms/watch"
+	"github.com/seveye/goms/util"
+	"github.com/seveye/goms/watch"
 
 	"github.com/golang/protobuf/proto"
 )

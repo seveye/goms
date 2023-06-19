@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"gitee.com/jkkkls/goms/rpc"
+	"github.com/seveye/goms/rpc"
 )
 
 func main() {

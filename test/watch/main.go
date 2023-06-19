@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"log"
 
-	"gitee.com/jkkkls/goms/rpc"
-	"gitee.com/jkkkls/goms/watch"
-	"gitee.com/jkkkls/goms/watch_config"
+	"github.com/seveye/goms/rpc"
+	"github.com/seveye/goms/watch"
+	"github.com/seveye/goms/watch_config"
 )
 
 func main() {

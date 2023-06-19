@@ -6,7 +6,7 @@ import (
 	"net"
 	"os"
 
-	"gitee.com/jkkkls/goms/util"
+	"github.com/seveye/goms/util"
 )
 
 func RunTCPServer(port int) error {

@@ -1,6 +1,6 @@
 // Copyright 2017 guangbo. All rights reserved.
 
-//加解密散列接口，提供aes，des，md5接口
+// 加解密散列接口，提供aes，des，md5接口
 package util
 
 import (
@@ -12,10 +12,10 @@ import (
 	"fmt"
 	"io"
 
-	"gitee.com/jkkkls/goms/util/bytes_cache"
+	"github.com/seveye/goms/util/bytes_cache"
 )
 
-//DesEncrypt des加密函数，返回加密后的结果长度是8的倍数
+// DesEncrypt des加密函数，返回加密后的结果长度是8的倍数
 func DesEncrypt(origData, key []byte) ([]byte, error) {
 	block, err := des.NewCipher(key)
 	if err != nil {
@@ -39,7 +39,7 @@ func pKCS5Padding(ciphertext []byte, blockSize int) []byte {
 	return append(ciphertext, padtext...)
 }
 
-//DesDecrypt des解密函数，传入解密内容长度必须是8的倍数
+// DesDecrypt des解密函数，传入解密内容长度必须是8的倍数
 func DesDecrypt(crypted, key []byte) ([]byte, error) {
 	block, err := des.NewCipher(key)
 	if err != nil {
@@ -63,7 +63,7 @@ func pKCS5UnPadding(origData []byte) []byte {
 	return origData[:(length - unpadding)]
 }
 
-//AesEncrypt aes加密函数，返回加密后的结果长度是16的倍数
+// AesEncrypt aes加密函数，返回加密后的结果长度是16的倍数
 func AesEncrypt(origData, key []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
@@ -80,7 +80,7 @@ func AesEncrypt(origData, key []byte) ([]byte, error) {
 	return crypted, nil
 }
 
-//AesDecrypt aes解密函数，传入解密内容长度必须是16的倍数
+// AesDecrypt aes解密函数，传入解密内容长度必须是16的倍数
 func AesDecrypt(crypted, key []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
@@ -95,7 +95,7 @@ func AesDecrypt(crypted, key []byte) ([]byte, error) {
 	return origData, nil
 }
 
-//Md5 md5散列函数
+// Md5 md5散列函数
 func Md5(str string) string {
 	h := md5.New()
 	io.WriteString(h, str)

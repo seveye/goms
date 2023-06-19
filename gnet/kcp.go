@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"gitee.com/jkkkls/goms/util"
+	"github.com/seveye/goms/util"
 	kcp "github.com/xtaci/kcp-go"
 )
 

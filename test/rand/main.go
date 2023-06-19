@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"gitee.com/jkkkls/goms/util/bytes_cache"
+	"github.com/seveye/goms/util/bytes_cache"
 )
 
 func main() {

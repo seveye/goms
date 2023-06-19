@@ -1,6 +1,6 @@
 // Copyright 2017 guangbo. All rights reserved.
 
-//rpc编码解码模块
+// rpc编码解码模块
 package rpc
 
 import (
@@ -12,11 +12,11 @@ import (
 	"io"
 	"sync"
 
-	"gitee.com/jkkkls/goms/util/bytes_cache"
 	"github.com/golang/protobuf/proto"
+	"github.com/seveye/goms/util/bytes_cache"
 )
 
-//tooBig 内部通讯最大消息长度 1G
+// tooBig 内部通讯最大消息长度 1G
 const tooBig = 1 << 30
 
 var errBadCount = errors.New("invalid message length")

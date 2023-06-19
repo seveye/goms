@@ -7,7 +7,7 @@ package watch_config
 import (
 	"encoding/json"
 
-	"gitee.com/jkkkls/goms/watch"
+	"github.com/seveye/goms/watch"
 )
 
 const (
@@ -25,7 +25,7 @@ type GateInfo struct {
 	Time       int64
 }
 
-//GetAllGate 获取所有网关信息
+// GetAllGate 获取所有网关信息
 func GetAllGate(client *watch.WatchClient) []*GateInfo {
 	var gates []*GateInfo
 	values := client.Hgetall(GateKey)
@@ -37,13 +37,13 @@ func GetAllGate(client *watch.WatchClient) []*GateInfo {
 	return gates
 }
 
-//SetGateInfo 保存网关信息
+// SetGateInfo 保存网关信息
 func SetGateInfo(client *watch.WatchClient, gate *GateInfo) {
 	buff, _ := json.Marshal(gate)
 	client.Hset(GateKey, gate.Name, string(buff))
 }
 
-//GetGateInfo 获取指定网关信息
+// GetGateInfo 获取指定网关信息
 func GetGateInfo(client *watch.WatchClient, name string) *GateInfo {
 	value := client.Hget(GateKey, name)
 	if value == "" {

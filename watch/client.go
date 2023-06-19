@@ -1,7 +1,7 @@
 // Copyright 2017 guangbo. All rights reserved.
 
-//watch模块客户端
-//使用示例参考gitee.com/goxiang2/server/example/watch
+// watch模块客户端
+// 使用示例参考gitee.com/goxiang2/server/example/watch
 package watch
 
 import (
@@ -12,7 +12,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"gitee.com/jkkkls/goms/util"
+	"github.com/seveye/goms/util"
 )
 
 type WatchCallback func(string, string)
@@ -277,7 +277,7 @@ func (wc *WatchClient) Watch() (string, string, string) {
 	return rsp.Values[0], rsp.Values[1], rsp.Values[2]
 }
 
-//readChan 读取房间返回，1分钟超时
+// readChan 读取房间返回，1分钟超时
 func readChan(c chan *WatchMessage) *WatchMessage {
 	t := time.NewTimer(10 * time.Second)
 	defer t.Stop()

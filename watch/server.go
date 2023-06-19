@@ -1,7 +1,7 @@
 // Copyright 2017 guangbo. All rights reserved.
 
-//watch模块服务端
-//使用示例参考gitee.com/goxiang2/server/example/watch
+// watch模块服务端
+// 使用示例参考gitee.com/goxiang2/server/example/watch
 package watch
 
 import (
@@ -13,10 +13,10 @@ import (
 	"strconv"
 	"sync"
 
-	"gitee.com/jkkkls/goms/util"
+	"github.com/seveye/goms/util"
 )
 
-//watch连接信息
+// watch连接信息
 type WatchConnect struct {
 	Id        int           //客户端连接id
 	Conn      net.Conn      //

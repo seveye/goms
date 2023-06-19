@@ -8,8 +8,8 @@ import (
 	"io"
 	"time"
 
-	"gitee.com/jkkkls/goms/util/bytes_cache"
 	"github.com/golang/protobuf/proto"
+	"github.com/seveye/goms/util/bytes_cache"
 
 	"github.com/gorilla/websocket"
 )
@@ -19,7 +19,8 @@ import (
 //     是否加密（1字节）| 长度（2字节）| cmd（2字节）| 序列号（2字节）| 俱乐部id（4字节）| 预留（1字节）| 加密数据（n字节）
 
 // 响应，协议头固定12字节：
-//     是否加密（1字节）| 长度（2字节）| cmd（2字节）| 序列号（2字节）| 返回值（4字节）| 预留（1字节）| 加密数据（n字节）
+//
+//	是否加密（1字节）| 长度（2字节）| cmd（2字节）| 序列号（2字节）| 返回值（4字节）| 预留（1字节）| 加密数据（n字节）
 type RequestMessage struct {
 	Crype       uint8
 	Length      uint16
@@ -31,10 +32,10 @@ type RequestMessage struct {
 	Disconn     bool
 }
 
-//通讯密钥
+// 通讯密钥
 var AesKey = []byte("12345678901234567890123456789012")
 
-//WsConn websocket封装
+// WsConn websocket封装
 type WsConn struct {
 	Conn *websocket.Conn
 	Buff bytes.Buffer
@@ -69,7 +70,7 @@ func (s *WsConn) SetWriteDeadline(t time.Time) error {
 	return s.Conn.SetWriteDeadline(t)
 }
 
-//ReadMessage 通用读取请求接口
+// ReadMessage 通用读取请求接口
 func ReadMessage(r *bufio.Reader) (*RequestMessage, error) {
 	req := &RequestMessage{}
 	var (
@@ -110,7 +111,7 @@ func ReadMessage(r *bufio.Reader) (*RequestMessage, error) {
 	return req, nil
 }
 
-//WriteMessage 通用写请求接口
+// WriteMessage 通用写请求接口
 func WriteMessage(conn io.ReadWriteCloser, req *RequestMessage) error {
 	var err error
 	if len(req.Buff) == 0 && req.Pointer != nil {

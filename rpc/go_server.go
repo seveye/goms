@@ -19,8 +19,8 @@ import (
 
 	"github.com/golang/protobuf/jsonpb"
 
-	"gitee.com/jkkkls/goms/util"
 	"github.com/golang/protobuf/proto"
+	"github.com/seveye/goms/util"
 )
 
 // Precompute the reflect type for error. Can't use error directly

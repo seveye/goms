@@ -9,9 +9,9 @@ import (
 	"strings"
 	"time"
 
-	"gitee.com/jkkkls/goms/rpc"
-	"gitee.com/jkkkls/goms/util"
 	"github.com/codegangsta/negroni"
+	"github.com/seveye/goms/rpc"
+	"github.com/seveye/goms/util"
 )
 
 func fatal(err error) {

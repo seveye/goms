@@ -8,9 +8,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	"gitee.com/jkkkls/goms/rpc"
+	"github.com/seveye/goms/rpc"
 
-	"gitee.com/jkkkls/goms/util"
+	"github.com/seveye/goms/util"
 	"google.golang.org/protobuf/proto"
 )
 

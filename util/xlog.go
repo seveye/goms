@@ -48,11 +48,7 @@ type GosLog struct {
 	Time    string
 	Logs    chan *GosLogContent
 
-	ZincDomain   string
-	ZincUsername string
-	ZincPwd      string
-	Nodename     string
-	ZincIndex    string //默认按日分索引
+	plugin []func(map[string]any)
 }
 
 // LogColor 颜色标签
@@ -84,13 +80,9 @@ func init() {
 
 type LogParam func(*GosLog)
 
-func WithZinc(nodeName, index, domain, username, pwd string) LogParam {
+func WithPlugin(f func(map[string]any)) LogParam {
 	return func(l *GosLog) {
-		l.Nodename = nodeName
-		l.ZincIndex = index
-		l.ZincDomain = domain
-		l.ZincUsername = username
-		l.ZincPwd = pwd
+		l.plugin = append(l.plugin, f)
 	}
 }
 
@@ -167,18 +159,24 @@ func GosLogNewRouter(name string) *GosLog {
 					return
 				}
 				gl.checkTime()
-				data, data2 := info.jsonFormat(gl.ZincDomain != "")
+				data, m := info.jsonFormat()
 				gl.LogFile.Write(data)
 				gl.LogFile.WriteString("\n")
 
-				if gl.ZincDomain != "" {
-					Submit(func() {
-						err := WriteZinc(gl.ZincDomain, gl.ZincUsername, gl.ZincPwd, gl.ZincIndex, data2)
-						if err != nil {
-							log.Println("WriteZinc", err)
-						}
-					})
-				}
+				Submit(func() {
+					for _, v := range gl.plugin {
+						v(m)
+					}
+				})
+
+				// if gl.ZincDomain != "" {
+				// 	Submit(func() {
+				// 		err := WriteZinc(gl.ZincDomain, gl.ZincUsername, gl.ZincPwd, gl.ZincIndex, data2)
+				// 		if err != nil {
+				// 			log.Println("WriteZinc", err)
+				// 		}
+				// 	})
+				// }
 			}
 		}
 	}(l)
@@ -212,7 +210,7 @@ func (info *GosLogContent) textFormat() string {
 		year, month, day, hour, min, sec, info.Now.Nanosecond()/1000, level, short, info.Line, info.Text, param)
 }
 
-func (info *GosLogContent) jsonFormat(zinc bool) ([]byte, []byte) {
+func (info *GosLogContent) jsonFormat() ([]byte, map[string]any) {
 	short := info.File
 	for i := len(info.File) - 1; i > 0; i-- {
 		if info.File[i] == '/' {
@@ -223,15 +221,11 @@ func (info *GosLogContent) jsonFormat(zinc bool) ([]byte, []byte) {
 	year, month, day := info.Now.Date()
 	hour, min, sec := info.Now.Clock()
 
-	m := make(map[string]interface{})
+	m := make(map[string]any)
 	m["time"] = fmt.Sprintf("%04d-%02d-%02d %02d:%02d:%02d.%06d", year, month, day, hour, min, sec, info.Now.Nanosecond()/1000)
 	m["line"] = fmt.Sprintf("%s:%d", short, info.Line)
 	m["level"] = fmt.Sprintf("%s", info.Level)
 	m["msg"] = info.Text
-
-	if defaultLog.Nodename != "" {
-		m["nodeName"] = defaultLog.Nodename
-	}
 
 	l := len(info.Param) / 2
 	for i := 0; i < l; i++ {
@@ -246,11 +240,7 @@ func (info *GosLogContent) jsonFormat(zinc bool) ([]byte, []byte) {
 		fmt.Println("log error", err, m["line"])
 	}
 
-	var buff2 []byte
-	if zinc {
-		buff2, err = json.Marshal([]map[string]interface{}{m})
-	}
-	return buff, buff2
+	return buff, m
 }
 
 func (l *GosLog) SetLevel(level int) {

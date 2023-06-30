@@ -32,7 +32,8 @@ type WatchClient struct {
 
 	Calls sync.Map //watch回调
 
-	Seq int32
+	isClose bool
+	Seq     int32
 }
 
 // Dial 启动WatchServer
@@ -81,18 +82,20 @@ func (wc *WatchClient) RegisterCallback(key string, call WatchCallback) {
 
 // Start 启动读写协程
 func (wc *WatchClient) Start() {
+	wc.isClose = false
+
 	//处理消息接受
 	go func() {
 		defer util.Recover()
 		defer func() {
 			wc.Conn.Close()
+			wc.isClose = true
 			close(wc.Close)
 		}()
 
 		for {
 			msg, err := ReadWatchMessage(wc.Reader)
 			if err != nil {
-				util.Error("watch服务器断开连接，错误信息:", "err", err)
 				time.AfterFunc(10*time.Second, wc.Reconnect)
 				return
 			}
@@ -181,6 +184,9 @@ func (wc *WatchClient) RawCall(param []string) []string {
 
 // initialize 初始化watch信息
 func (wc *WatchClient) initialize(keys []string) {
+	if wc.isClose {
+		return
+	}
 	wc.SendAndRecvMessage(&WatchMessage{
 		Cmd:    "initialize",
 		Seq:    int(atomic.AddInt32(&wc.Seq, 1)),
@@ -190,6 +196,9 @@ func (wc *WatchClient) initialize(keys []string) {
 
 // heartbeat 心跳
 func (wc *WatchClient) heartbeat() {
+	if wc.isClose {
+		return
+	}
 	wc.SendAndRecvMessage(&WatchMessage{
 		Cmd: "heartbeat",
 		Seq: int(atomic.AddInt32(&wc.Seq, 1)),
@@ -198,6 +207,9 @@ func (wc *WatchClient) heartbeat() {
 
 // Hget 客户端请求key,field信息
 func (wc *WatchClient) Hget(key string, field string) string {
+	if wc.isClose {
+		return ""
+	}
 	msg, err := wc.SendAndRecvMessage(&WatchMessage{
 		Cmd:    "hget",
 		Seq:    int(atomic.AddInt32(&wc.Seq, 1)),
@@ -213,6 +225,9 @@ func (wc *WatchClient) Hget(key string, field string) string {
 
 // Hgetall 客户端请求key信息
 func (wc *WatchClient) Hgetall(key string) []string {
+	if wc.isClose {
+		return []string{}
+	}
 	msg, err := wc.SendAndRecvMessage(&WatchMessage{
 		Cmd:    "hgetall",
 		Seq:    int(atomic.AddInt32(&wc.Seq, 1)),
@@ -228,6 +243,9 @@ func (wc *WatchClient) Hgetall(key string) []string {
 
 // Hset 设置key信息
 func (wc *WatchClient) Hset(key string, field string, value string) {
+	if wc.isClose {
+		return
+	}
 	wc.SendAndRecvMessage(&WatchMessage{
 		Cmd:    "hset",
 		Seq:    int(atomic.AddInt32(&wc.Seq, 1)),
@@ -237,6 +255,9 @@ func (wc *WatchClient) Hset(key string, field string, value string) {
 
 // Hset 设置key信息
 func (wc *WatchClient) KeyPrefix(prefix string) []string {
+	if wc.isClose {
+		return []string{}
+	}
 	msg, err := wc.SendAndRecvMessage(&WatchMessage{
 		Cmd:    "key_prefix",
 		Seq:    int(atomic.AddInt32(&wc.Seq, 1)),
@@ -249,6 +270,9 @@ func (wc *WatchClient) KeyPrefix(prefix string) []string {
 }
 
 func (wc *WatchClient) Del(key string) {
+	if wc.isClose {
+		return
+	}
 	wc.SendAndRecvMessage(&WatchMessage{
 		Cmd:    "del",
 		Seq:    int(atomic.AddInt32(&wc.Seq, 1)),
@@ -257,6 +281,9 @@ func (wc *WatchClient) Del(key string) {
 }
 
 func (wc *WatchClient) Hincrby(key, field string, add int) int {
+	if wc.isClose {
+		return 0
+	}
 	msg, err := wc.SendAndRecvMessage(&WatchMessage{
 		Cmd:    "hincrby",
 		Seq:    int(atomic.AddInt32(&wc.Seq, 1)),

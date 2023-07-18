@@ -22,7 +22,7 @@ import (
 	"github.com/seveye/goms/util"
 	"github.com/seveye/goms/watch"
 
-	"github.com/golang/protobuf/proto"
+	"google.golang.org/protobuf/proto"
 )
 
 // GxService 服务接口

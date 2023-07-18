@@ -6,8 +6,8 @@ import (
 	"net"
 	"time"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/seveye/goms/rpc"
+	"google.golang.org/protobuf/proto"
 )
 
 type User struct{}
@@ -59,7 +59,7 @@ func main() {
 	c, _ := rpc.Dial("tcp", "127.0.0.1:12323")
 
 	log.Println("----client1----")
-	req := &AddReq{123123, 3}
+	req := &AddReq{A: 123123, B: 3}
 	buff, _ := json.Marshal(req)
 	conn := &rpc.Context{
 		Remote: "127.0.0.1:1111",

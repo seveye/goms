@@ -8,8 +8,8 @@ import (
 	"io"
 	"time"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/seveye/goms/util/bytes_cache"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/gorilla/websocket"
 )

@@ -17,10 +17,9 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/golang/protobuf/jsonpb"
-
-	"github.com/golang/protobuf/proto"
 	"github.com/seveye/goms/util"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
 )
 
 // Precompute the reflect type for error. Can't use error directly
@@ -295,7 +294,7 @@ func (server *Server) RawCall(conn *Context, serviceMethod string, reqBuff []byt
 
 	if pb, ok := argv.Interface().(proto.Message); ok {
 		if js {
-			jsonpb.UnmarshalString(string(reqBuff), pb)
+			protojson.Unmarshal(reqBuff, pb)
 		} else {
 			proto.Unmarshal(reqBuff, pb)
 		}

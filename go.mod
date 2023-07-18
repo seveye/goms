@@ -8,7 +8,6 @@ require (
 	github.com/fasthttp/websocket v1.5.1
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/go-sql-driver/mysql v1.6.0
-	github.com/golang/protobuf v1.5.2
 	github.com/google/gops v0.3.12
 	github.com/gorilla/websocket v1.4.2
 	github.com/panjf2000/ants/v2 v2.4.8
@@ -17,7 +16,7 @@ require (
 	github.com/xtaci/kcp-go v5.4.20+incompatible
 	go.mongodb.org/mongo-driver v1.4.2
 	golang.org/x/sys v0.0.0-20220829200755-d48e67d00261
-	google.golang.org/protobuf v1.27.1
+	google.golang.org/protobuf v1.31.0
 )
 
 require (

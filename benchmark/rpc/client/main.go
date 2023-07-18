@@ -4,9 +4,9 @@ import (
 	"log"
 	"time"
 
-	"github.com/golang/protobuf/proto"
 	pb "github.com/seveye/goms/benchmark/rpc/proto"
 	"github.com/seveye/goms/rpc"
+	"google.golang.org/protobuf/proto"
 )
 
 var host = "192.168.0.119:12323"

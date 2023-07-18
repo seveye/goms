@@ -1,5 +1,6 @@
 syntax = "proto3";
 package main;
+option go_package = "github.com/seveye/goms/examples/rpc/main";
 
 message AddReq {
 	uint64 a = 1;

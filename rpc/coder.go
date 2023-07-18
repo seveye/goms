@@ -12,8 +12,8 @@ import (
 	"io"
 	"sync"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/seveye/goms/util/bytes_cache"
+	"google.golang.org/protobuf/proto"
 )
 
 // tooBig 内部通讯最大消息长度 1G

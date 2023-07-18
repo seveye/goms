@@ -447,6 +447,7 @@ func AddServiceMethod(nodeName string, nodeType string, cmd uint16, serviceMetho
 	if nodeName == NodeIntance.Name {
 		log.Println("注册对外接口", "nodeName:", nodeName, "key:", key, "serviceMethod:", serviceMethod)
 	}
+	NodeIntance.CmdService.Store(fmt.Sprintf(".%v", cmd), serviceMethod)
 }
 
 // FindServiceMethod 查询服务方法

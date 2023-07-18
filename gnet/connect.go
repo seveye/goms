@@ -249,11 +249,20 @@ func (g *Gater) handleConn(rwc io.ReadWriteCloser, remote string, connType strin
 				rpcConn.CallId = rpc.NewId(0)
 				rpcConn.Game = msg.App
 
-				if msg.isJson() {
-					ret, rspBuff, retErr = rpc.NodeJsonCallWithConn(rpcConn, msg.NodeName, serverMethod, msg.Buff)
+				if msg.NodeName != "" {
+					if msg.isJson() {
+						ret, rspBuff, retErr = rpc.NodeJsonCallWithConn(rpcConn, msg.NodeName, serverMethod, msg.Buff)
+					} else {
+						ret, rspBuff, retErr = rpc.NodeRawCallWithConn(rpcConn, msg.NodeName, serverMethod, msg.Buff)
+					}
 				} else {
-					ret, rspBuff, retErr = rpc.NodeRawCallWithConn(rpcConn, msg.NodeName, serverMethod, msg.Buff)
+					if msg.isJson() {
+						ret, rspBuff, retErr = rpc.JsonCall(rpcConn, serverMethod, msg.Buff)
+					} else {
+						ret, rspBuff, retErr = rpc.RawCall(rpcConn, serverMethod, msg.Buff)
+					}
 				}
+
 				if retErr != nil && ret == 0 {
 					ret = 1
 				}

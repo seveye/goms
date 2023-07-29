@@ -196,6 +196,7 @@ type NodeConfig struct {
 	Port     int                //节点rpc端口
 	Region   uint32             //地区
 	Cmds     map[string]int32   //节点支持cmd的，需要使用protobuf定义的cmd
+	HttpPort int                //节点http端口
 }
 
 // InitNode 初始化服务节点
@@ -314,6 +315,18 @@ func InitNode(config *NodeConfig) {
 			}
 		})
 	}
+
+	//
+	if config.HttpPort != 0 {
+		go func() {
+			err := RunHttpGateway(config.HttpPort)
+			if err != nil {
+				fmt.Println("listen error", err)
+				os.Exit(0)
+			}
+		}()
+	}
+
 	l, err := net.Listen("tcp", listenPort)
 	if err != nil {
 		fmt.Println("listen error", err)

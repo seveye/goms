@@ -3,11 +3,14 @@ package main
 import (
 	"log"
 	"net"
+	"net/http"
+	_ "net/http/pprof"
 
 	"github.com/google/gops/agent"
 
 	"github.com/seveye/goms/benchmark/rpc/proto"
 	"github.com/seveye/goms/rpc"
+	"github.com/seveye/goms/util"
 )
 
 type User struct{}
@@ -18,6 +21,10 @@ func (t *User) Add(conn *rpc.Context, args *proto.AddReq, reply *proto.AddRsp) (
 }
 
 func main() {
+	go http.ListenAndServe(":6063", nil)
+
+	util.SetUlimit()
+
 	if err := agent.Listen(agent.Options{}); err != nil {
 		log.Println(err)
 		return
@@ -31,6 +38,7 @@ func main() {
 	if err != nil {
 		log.Fatal("listen error:", err)
 	}
-	s.Accept(l)
 
+	log.Println("rpc server start")
+	s.Accept(l)
 }

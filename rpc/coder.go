@@ -5,6 +5,7 @@ package rpc
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/binary"
 	"encoding/json"
 	"errors"
@@ -21,7 +22,7 @@ const tooBig = 1 << 30
 
 var errBadCount = errors.New("invalid message length")
 
-func writeFrame(w *bufio.Writer, buf []byte) error {
+func writeFrame(w *bytes.Buffer, buf []byte) error {
 	l := len(buf)
 	if l >= tooBig {
 		return errBadCount
@@ -60,7 +61,7 @@ func readFrame(r *bufio.Reader) ([]byte, error) {
 	return buff, nil
 }
 
-func encode(w *bufio.Writer, raw int32, m interface{}) error {
+func encode(w *bytes.Buffer, raw int32, m interface{}) error {
 	if pb, ok := m.(proto.Message); ok {
 		if raw == 2 {
 			buf, err := json.Marshal(pb)
@@ -132,11 +133,18 @@ func (c *PbClientCodec) WriteRequest(r *Request, body interface{}) error {
 			Game:     r.Conn.Game,
 		}
 	}
-	err := encode(c.w, 0, &c.req)
+
+	var buff bytes.Buffer
+	err := encode(&buff, 0, &c.req)
 	if err != nil {
 		return err
 	}
-	if err = encode(c.w, 0, body); err != nil {
+	if err = encode(&buff, 0, body); err != nil {
+		return err
+	}
+
+	_, err = c.w.Write(buff.Bytes())
+	if err != nil {
 		return err
 	}
 	return c.w.Flush()
@@ -160,12 +168,13 @@ func (c *PbClientCodec) ReadResponseBody(raw int32, body interface{}) error {
 }
 
 func (c *PbClientCodec) WriteByteRequest(r *Request, buf []byte) error {
-	c.req.Reset()
-	c.req.Method = r.ServiceMethod
-	c.req.Seq = r.Seq
-	c.req.Raw = int32(r.Raw)
+	var req ReqHeader
+	req.Reset()
+	req.Method = r.ServiceMethod
+	req.Seq = r.Seq
+	req.Raw = int32(r.Raw)
 	if r.Conn != nil {
-		c.req.Context = &Context{
+		req.Context = &Context{
 			GateName: r.Conn.GateName,
 			Remote:   r.Conn.Remote,
 			Id:       r.Conn.Id,
@@ -178,11 +187,17 @@ func (c *PbClientCodec) WriteByteRequest(r *Request, buf []byte) error {
 		}
 	}
 
-	err := encode(c.w, 0, &c.req)
+	var buff bytes.Buffer
+	err := encode(&buff, 0, &req)
 	if err != nil {
 		return err
 	}
-	if err = writeFrame(c.w, buf); err != nil {
+	if err = writeFrame(&buff, buf); err != nil {
+		return err
+	}
+
+	_, err = c.w.Write(buff.Bytes())
+	if err != nil {
 		return err
 	}
 	return c.w.Flush()
@@ -216,24 +231,28 @@ func NewPbServerCodec(rwc io.ReadWriteCloser) ServerCodec {
 
 func (c *PbServerCodec) WriteResponse(resp *Response, body interface{}) error {
 	c.mu.Lock()
+	defer c.mu.Unlock()
+
 	c.resp.Method = resp.ServiceMethod
 	c.resp.Seq = resp.Seq
 	c.resp.Error = resp.Error
 	c.resp.Ret = uint32(resp.Ret)
 	c.resp.Raw = int32(resp.Raw)
 
-	err := encode(c.w, 0, &c.resp)
+	var buff bytes.Buffer
+	err := encode(&buff, 0, &c.resp)
 	if err != nil {
-		c.mu.Unlock()
 		return err
 	}
-	if err = encode(c.w, c.resp.Raw, body); err != nil {
-		c.mu.Unlock()
+	if err = encode(&buff, c.resp.Raw, body); err != nil {
 		return err
 	}
-	err = c.w.Flush()
-	c.mu.Unlock()
-	return err
+
+	_, err = c.w.Write(buff.Bytes())
+	if err != nil {
+		return err
+	}
+	return c.w.Flush()
 }
 
 func (c *PbServerCodec) ReadRequestHeader(req *Request) error {

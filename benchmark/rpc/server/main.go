@@ -5,15 +5,18 @@ import (
 	"net"
 
 	"github.com/google/gops/agent"
+	"google.golang.org/protobuf/proto"
 
-	"github.com/seveye/goms/benchmark/rpc/proto"
+	pb "github.com/seveye/goms/benchmark/rpc/proto"
 	"github.com/seveye/goms/rpc"
 )
 
 type User struct{}
 
-func (t *User) Add(conn *rpc.Context, args *proto.AddReq, reply *proto.AddRsp) (uint32, error) {
-	reply.C = args.A + args.B
+func (t *User) Add(conn *rpc.Context, args *pb.AddReq, msg proto.Message) (uint32, error) {
+	// func (t *User) Add(conn *rpc.Context, args *pb.AddReq, reply *pb.AddRsp) (uint32, error) {
+	// reply.C = args.A + args.B
+	// reply.Name = args.Name
 	return 123, nil
 }
 

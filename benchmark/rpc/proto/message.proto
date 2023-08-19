@@ -1,10 +1,13 @@
 syntax = "proto3";
+option go_package = ".;proto";
 
 message AddReq {
 	uint64 a = 1;
 	uint64 b = 2;
+	string name = 3;
 }
 
 message AddRsp {
 	uint64 c = 1;
+	string name = 2;
 }

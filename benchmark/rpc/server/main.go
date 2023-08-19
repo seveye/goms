@@ -13,10 +13,12 @@ import (
 
 type User struct{}
 
-func (t *User) Add(conn *rpc.Context, args *pb.AddReq, msg proto.Message) (uint32, error) {
-	// func (t *User) Add(conn *rpc.Context, args *pb.AddReq, reply *pb.AddRsp) (uint32, error) {
-	// reply.C = args.A + args.B
-	// reply.Name = args.Name
+func (t *User) Add2(conn *rpc.Context, args *pb.AddReq, msg proto.Message) (uint16, error) {
+	return 123, nil
+}
+func (t *User) Add(conn *rpc.Context, args *pb.AddReq, reply *pb.AddRsp) (uint16, error) {
+	reply.C = args.A + args.B
+	reply.Name = args.Name
 	return 123, nil
 }
 

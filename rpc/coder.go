@@ -99,11 +99,10 @@ func decode(r *bufio.Reader, raw int32, m interface{}) error {
 }
 
 type PbClientCodec struct {
-	req  ReqHeader
-	resp RspHeader
-	c    io.ReadWriteCloser
-	w    *bufio.Writer
-	r    *bufio.Reader
+	c  io.ReadWriteCloser
+	w  *bufio.Writer
+	r  *bufio.Reader
+	mu sync.Mutex
 }
 
 func NewPbClientCodec(rwc io.ReadWriteCloser) ClientCodec {
@@ -115,13 +114,13 @@ func NewPbClientCodec(rwc io.ReadWriteCloser) ClientCodec {
 }
 
 func (c *PbClientCodec) WriteRequest(r *Request, body interface{}) error {
-	c.req.Reset()
-	c.req.Method = r.ServiceMethod
-	c.req.Seq = r.Seq
-	c.req.NoResp = r.NoResp
-	c.req.Raw = int32(r.Raw)
+	var req ReqHeader
+	req.Method = r.ServiceMethod
+	req.Seq = r.Seq
+	req.NoResp = r.NoResp
+	req.Raw = int32(r.Raw)
 	if r.Conn != nil {
-		c.req.Context = &Context{
+		req.Context = &Context{
 			GateName: r.Conn.GateName,
 			Remote:   r.Conn.Remote,
 			Id:       r.Conn.Id,
@@ -135,7 +134,7 @@ func (c *PbClientCodec) WriteRequest(r *Request, body interface{}) error {
 	}
 
 	var buff bytes.Buffer
-	err := encode(&buff, 0, &c.req)
+	err := encode(&buff, 0, &req)
 	if err != nil {
 		return err
 	}
@@ -143,6 +142,8 @@ func (c *PbClientCodec) WriteRequest(r *Request, body interface{}) error {
 		return err
 	}
 
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	_, err = c.w.Write(buff.Bytes())
 	if err != nil {
 		return err
@@ -151,15 +152,15 @@ func (c *PbClientCodec) WriteRequest(r *Request, body interface{}) error {
 }
 
 func (c *PbClientCodec) ReadResponseHeader(r *Response) error {
-	c.resp.Reset()
-	err := decode(c.r, 0, &c.resp)
+	var resp RspHeader
+	err := decode(c.r, 0, &resp)
 	if err != nil {
 		return err
 	}
-	r.ServiceMethod = c.resp.Method
-	r.Seq = c.resp.Seq
-	r.Error = c.resp.Error
-	r.Ret = uint16(c.resp.Ret)
+	r.ServiceMethod = resp.Method
+	r.Seq = resp.Seq
+	r.Error = resp.Error
+	r.Ret = uint16(resp.Ret)
 	return nil
 }
 
@@ -169,7 +170,6 @@ func (c *PbClientCodec) ReadResponseBody(raw int32, body interface{}) error {
 
 func (c *PbClientCodec) WriteByteRequest(r *Request, buf []byte) error {
 	var req ReqHeader
-	req.Reset()
 	req.Method = r.ServiceMethod
 	req.Seq = r.Seq
 	req.Raw = int32(r.Raw)
@@ -196,6 +196,8 @@ func (c *PbClientCodec) WriteByteRequest(r *Request, buf []byte) error {
 		return err
 	}
 
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	_, err = c.w.Write(buff.Bytes())
 	if err != nil {
 		return err
@@ -230,24 +232,25 @@ func NewPbServerCodec(rwc io.ReadWriteCloser) ServerCodec {
 }
 
 func (c *PbServerCodec) WriteResponse(resp *Response, body interface{}) error {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
-	c.resp.Method = resp.ServiceMethod
-	c.resp.Seq = resp.Seq
-	c.resp.Error = resp.Error
-	c.resp.Ret = uint32(resp.Ret)
-	c.resp.Raw = int32(resp.Raw)
+	//TODO: 优化, 使用缓存池
+	var cresp RspHeader
+	cresp.Method = resp.ServiceMethod
+	cresp.Seq = resp.Seq
+	cresp.Error = resp.Error
+	cresp.Ret = uint32(resp.Ret)
+	cresp.Raw = int32(resp.Raw)
 
 	var buff bytes.Buffer
-	err := encode(&buff, 0, &c.resp)
+	err := encode(&buff, 0, &cresp)
 	if err != nil {
 		return err
 	}
-	if err = encode(&buff, c.resp.Raw, body); err != nil {
+	if err = encode(&buff, cresp.Raw, body); err != nil {
 		return err
 	}
 
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	_, err = c.w.Write(buff.Bytes())
 	if err != nil {
 		return err

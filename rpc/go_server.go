@@ -227,7 +227,7 @@ func suitableMethods(name string, typ reflect.Type, reportErr bool) map[string]*
 			continue
 		}
 		methods[mname] = &methodType{method: method, ArgType: argType, ReplyType: replyType}
-		// log.Printf("[%v]register method: %v\n", name, mname)
+		log.Printf("[%v]register method: %v\n", name, mname)
 	}
 	return methods
 }

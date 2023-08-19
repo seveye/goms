@@ -17,8 +17,8 @@ import (
 var host = "127.0.0.1:12323"
 
 func testRpcCall(n, c, t int) {
-	// req := &pb.AddReq{A: 123123, B: 3, Name: strings.Repeat("1234", 32)}
-	// buff, _ := proto.Marshal(req)
+	req := &pb.AddReq{A: 123123, B: 3, Name: strings.Repeat("1234", 32)}
+	buff, _ := proto.Marshal(req)
 
 	info := &rpc.Context{
 		Remote: "127.0.0.1:1111",
@@ -33,8 +33,6 @@ func testRpcCall(n, c, t int) {
 
 		for j := 0; j < c; j++ {
 			w.Add(1)
-			req := &pb.AddReq{A: 123123, B: uint64(j), Name: strings.Repeat("1234", 32)}
-			buff, _ := proto.Marshal(req)
 			go func() {
 				defer w.Done()
 				for k := 0; k < t; k++ {
@@ -111,9 +109,10 @@ func main() {
 	// 2023/08/19 13:22:09 同步调用测试 1000000 2.50515229s
 	// 2023/08/19 13:22:28 同步调用测试 10000000 18.692950235s
 	//同步调用
-	// testRpcCall(1, 1, 1000000)
-	testRpcCall(1, 10, 100000)
+	testRpcCall(1, 1, 1000000)
+	// testRpcCall(1, 10, 100000)
 	// testRpcCall(10, 1, 100000)
 	// testRpcCall(10, 10, 10000)
 	// testRpcCall(10, 100, 10000)
+
 }

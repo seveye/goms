@@ -114,7 +114,9 @@ func NewPbClientCodec(rwc io.ReadWriteCloser) ClientCodec {
 }
 
 func (c *PbClientCodec) WriteRequest(r *Request, body interface{}) error {
-	var req ReqHeader
+	req := reqHeaderPool.Get().(*ReqHeader)
+	defer reqHeaderPool.Put(req)
+	req.Reset()
 	req.Method = r.ServiceMethod
 	req.Seq = r.Seq
 	req.NoResp = r.NoResp
@@ -134,7 +136,7 @@ func (c *PbClientCodec) WriteRequest(r *Request, body interface{}) error {
 	}
 
 	var buff bytes.Buffer
-	err := encode(&buff, 0, &req)
+	err := encode(&buff, 0, req)
 	if err != nil {
 		return err
 	}
@@ -152,8 +154,10 @@ func (c *PbClientCodec) WriteRequest(r *Request, body interface{}) error {
 }
 
 func (c *PbClientCodec) ReadResponseHeader(r *Response) error {
-	var resp RspHeader
-	err := decode(c.r, 0, &resp)
+	resp := rspHeaderPool.Get().(*RspHeader)
+	defer rspHeaderPool.Put(resp)
+	resp.Reset()
+	err := decode(c.r, 0, resp)
 	if err != nil {
 		return err
 	}
@@ -169,7 +173,9 @@ func (c *PbClientCodec) ReadResponseBody(raw int32, body interface{}) error {
 }
 
 func (c *PbClientCodec) WriteByteRequest(r *Request, buf []byte) error {
-	var req ReqHeader
+	req := reqHeaderPool.Get().(*ReqHeader)
+	defer reqHeaderPool.Put(req)
+	req.Reset()
 	req.Method = r.ServiceMethod
 	req.Seq = r.Seq
 	req.Raw = int32(r.Raw)
@@ -188,7 +194,7 @@ func (c *PbClientCodec) WriteByteRequest(r *Request, buf []byte) error {
 	}
 
 	var buff bytes.Buffer
-	err := encode(&buff, 0, &req)
+	err := encode(&buff, 0, req)
 	if err != nil {
 		return err
 	}

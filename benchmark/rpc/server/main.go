@@ -4,7 +4,9 @@ import (
 	"log"
 	"net"
 
-	"github.com/google/gops/agent"
+	"net/http"
+	_ "net/http/pprof"
+
 	"google.golang.org/protobuf/proto"
 
 	pb "github.com/seveye/goms/benchmark/rpc/proto"
@@ -23,10 +25,9 @@ func (t *User) Add(conn *rpc.Context, args *pb.AddReq, reply *pb.AddRsp) (uint16
 }
 
 func main() {
-	if err := agent.Listen(agent.Options{}); err != nil {
-		log.Println(err)
-		return
-	}
+	go func() {
+		log.Println(http.ListenAndServe("localhost:6061", nil))
+	}()
 
 	s := rpc.NewServer()
 

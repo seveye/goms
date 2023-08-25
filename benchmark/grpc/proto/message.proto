@@ -1,0 +1,18 @@
+syntax = "proto3";
+option go_package = ".;proto";
+
+message AddReq {
+	uint64 a = 1;
+	uint64 b = 2;
+	string name = 3;
+}
+
+message AddRsp {
+	uint64 c = 1;
+	string name = 2;
+}
+
+service AddService {
+	rpc Add(AddReq) returns (AddRsp) {}
+}
+// protoc -I. -I/Users/guangbo/work/tools/googleapis -I/Users/guangbo/work/tools/protobuf/src --gogu_out ./ --gogu_opt paths=source_relative --go-grpc_out ./ --go-grpc_opt paths=source_relative ./benchmark/grpc/proto/*.proto

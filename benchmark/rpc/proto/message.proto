@@ -1,7 +1,5 @@
 syntax = "proto3";
-option go_package = "benchmark/rpc/proto;proto";
-
-
+option go_package = ".;proto";
 
 message AddReq {
 	uint64 a = 1;

@@ -59,8 +59,8 @@ func WithTimeout(t int) ClientOption {
 type Client struct {
 	codec ClientCodec
 
-	reqMutex sync.Mutex // protects following
-	request  Request
+	// reqMutex sync.Mutex // protects following
+	// request  Request
 
 	mutex    sync.Mutex // protects following
 	seq      uint64
@@ -95,9 +95,6 @@ type ClientCodec interface {
 }
 
 func (client *Client) send(call *CallInfo) {
-	client.reqMutex.Lock()
-	defer client.reqMutex.Unlock()
-
 	// Register this call.
 	client.mutex.Lock()
 	if client.shutdown || client.closing {
@@ -114,18 +111,19 @@ func (client *Client) send(call *CallInfo) {
 	client.mutex.Unlock()
 
 	// Encode and send the request.
-	client.request.Seq = seq
-	client.request.ServiceMethod = call.ServiceMethod
-	client.request.Conn = call.Conn
-	client.request.NoResp = call.NoResp
-	client.request.Raw = call.Raw
+	request := &Request{}
+	request.Seq = seq
+	request.ServiceMethod = call.ServiceMethod
+	request.Conn = call.Conn
+	request.NoResp = call.NoResp
+	request.Raw = call.Raw
 
 	var err error
 	if call.Raw == 0 {
-		err = client.codec.WriteRequest(&client.request, call.Args)
+		err = client.codec.WriteRequest(request, call.Args)
 	} else {
 		//包括 byte和json格式
-		err = client.codec.WriteByteRequest(&client.request, call.Args.([]byte))
+		err = client.codec.WriteByteRequest(request, call.Args.([]byte))
 	}
 
 	if call.NoResp {
@@ -195,7 +193,6 @@ func (client *Client) input() {
 		}
 	}
 	// Terminate pending calls.
-	client.reqMutex.Lock()
 	client.mutex.Lock()
 	client.shutdown = true
 	closing := client.closing
@@ -211,7 +208,6 @@ func (client *Client) input() {
 		call.done()
 	}
 	client.mutex.Unlock()
-	client.reqMutex.Unlock()
 	if err != io.EOF && closing {
 		if client.CloseCallback != nil {
 			client.CloseCallback(client.Name, err)

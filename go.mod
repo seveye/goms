@@ -17,7 +17,7 @@ require (
 	github.com/valyala/fasthttp v1.44.0
 	github.com/xtaci/kcp-go v5.4.20+incompatible
 	go.mongodb.org/mongo-driver v1.4.2
-	golang.org/x/sys v0.7.0
+	golang.org/x/sys v0.12.0
 	google.golang.org/grpc v1.57.0
 	google.golang.org/protobuf v1.31.0
 	gorm.io/driver/mysql v1.5.1

@@ -12,7 +12,10 @@ import (
 )
 
 // 通讯密钥
-var AesKey = []byte("12345678901234567890123456789012")
+var (
+	AesKey   = []byte("12345678901234567890123456789012")
+	emptyKey = []byte("")
+)
 
 // Message 请求，协议头固定10字节：
 // 请求响应，协议头固定10字节：
@@ -45,6 +48,16 @@ func (m *Request) isJson() bool {
 
 // ReadMessage 通用读取请求接口
 func ReadMessage(r *bufio.Reader) (*Request, error) {
+	return ReadMessageWithKey(r, emptyKey)
+}
+
+// WriteMessage 通用写请求接口
+func WriteMessage(conn io.ReadWriteCloser, req *Request) error {
+	return WriteMessageWithKey(conn, req, emptyKey)
+}
+
+// ReadMessageWithKey 通用读取请求接口, key为通讯密钥，长度为32字节
+func ReadMessageWithKey(r *bufio.Reader, key []byte) (*Request, error) {
 	var (
 		req    = &Request{}
 		header = bytes_cache.Get(14)
@@ -79,8 +92,11 @@ func ReadMessage(r *bufio.Reader) (*Request, error) {
 	}
 
 	//解密
-	if req.isCrypto() {
-		req.Buff, err = util.AesDecrypt(buff, AesKey)
+	if len(key) == 0 && req.isCrypto() {
+		key = AesKey
+	}
+	if len(key) > 0 {
+		req.Buff, err = util.AesDecrypt(buff, key)
 		if err != nil {
 			return nil, err
 		}
@@ -91,19 +107,23 @@ func ReadMessage(r *bufio.Reader) (*Request, error) {
 	return req, nil
 }
 
-// WriteMessage 通用写请求接口
-func WriteMessage(conn io.ReadWriteCloser, req *Request) error {
+// WriteMessageWithKey 通用写请求接口, key为通讯密钥，长度为32字节
+func WriteMessageWithKey(conn io.ReadWriteCloser, req *Request, key []byte) error {
 	var (
 		buff = req.Buff
 		err  error
 		b    bytes.Buffer
 	)
-	if req.isCrypto() {
-		buff, err = util.AesEncrypt(req.Buff, AesKey)
+	if len(key) == 0 && req.isCrypto() {
+		key = AesKey
+	}
+	if len(key) > 0 {
+		buff, err = util.AesEncrypt(req.Buff, key)
 		if err != nil {
 			return err
 		}
 	}
+
 	b.WriteByte('G')
 	b.WriteByte(req.Mask)
 	b.Write([]byte(req.App))

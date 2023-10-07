@@ -26,6 +26,7 @@ type ClientConn struct {
 	App        string
 	Mask       uint8
 	RpcClient  *rpc.Client
+	Key        []byte
 }
 
 type InterceptorNewFunc func(*ClientConn) error                                  //新连接
@@ -149,7 +150,7 @@ func (conn *ClientConn) SendMessage(msg *Request) {
 		func() {
 			conn.Mutex.Lock()
 			defer conn.Mutex.Unlock()
-			err := WriteMessage(conn.Rwc, msg)
+			err := WriteMessageWithKey(conn.Rwc, msg, conn.Key)
 			if err != nil {
 				// api.Debug("writeMessage error", "remote", conn.Context.Remote, "uid", conn.ConnInfo.Uid, "err", err)
 				conn.Rwc.Close()
@@ -200,7 +201,7 @@ func (g *Gater) handleConn(rwc io.ReadWriteCloser, remote string, connType strin
 	for {
 	LOOP:
 		//读取消息
-		msg, err := ReadMessage(r)
+		msg, err := ReadMessageWithKey(r, conn.Key)
 		if err != nil {
 			util.Debug("readMessage error", "remote", conn.Context.Remote, "uid", conn.Context.Uid, "error", err)
 			return

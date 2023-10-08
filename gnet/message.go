@@ -6,6 +6,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"io"
+	"log"
 
 	"github.com/seveye/goms/util"
 	"github.com/seveye/goms/util/bytes_cache"
@@ -13,7 +14,7 @@ import (
 
 // 通讯密钥
 var (
-	AesKey   = []byte("12345678901234567890123456789012")
+	AesKey   = []byte("966f093f87c03f8bf9acb9f545a303b1")
 	emptyKey = []byte("")
 )
 
@@ -83,7 +84,6 @@ func ReadMessageWithKey(r *bufio.Reader, key []byte) (*Request, error) {
 	if req.Length == 0 {
 		return req, nil
 	}
-
 	//生存期间不确定，暂时不用交回给缓冲池
 	buff := bytes_cache.Get(int(req.Length))
 	_, err = io.ReadFull(r, buff)
@@ -92,10 +92,9 @@ func ReadMessageWithKey(r *bufio.Reader, key []byte) (*Request, error) {
 	}
 
 	//解密
-	if len(key) == 0 && req.isCrypto() {
-		key = AesKey
-	}
-	if len(key) > 0 {
+
+	if len(key) > 0 && req.isCrypto() {
+		log.Println("解密key", string(key), len(buff))
 		req.Buff, err = util.AesDecrypt(buff, key)
 		if err != nil {
 			return nil, err
@@ -114,10 +113,8 @@ func WriteMessageWithKey(conn io.ReadWriteCloser, req *Request, key []byte) erro
 		err  error
 		b    bytes.Buffer
 	)
-	if len(key) == 0 && req.isCrypto() {
-		key = AesKey
-	}
-	if len(key) > 0 {
+
+	if len(key) > 0 && req.isCrypto() {
 		buff, err = util.AesEncrypt(req.Buff, key)
 		if err != nil {
 			return err

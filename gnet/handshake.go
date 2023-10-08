@@ -7,6 +7,49 @@ import (
 	"math/big"
 )
 
+// Handshake 客户端dh算法握手逻辑
+func ClientHandshake(conn io.ReadWriteCloser) ([]byte, error) {
+	var err error
+	// 生成p,g,a
+	p, err := rand.Prime(rand.Reader, 1024)
+	if err != nil {
+		return nil, err
+	}
+
+	g, err := rand.Prime(rand.Reader, 1024)
+	if err != nil {
+		return nil, err
+	}
+
+	//私钥a不需要发送
+	a, err := rand.Prime(rand.Reader, 1024)
+	if err != nil {
+		return nil, err
+	}
+
+	// 计算A
+	A := big.NewInt(0)
+	A.Exp(g, a, p)
+
+	// 发送p,g,A
+	err = writeBigInts(conn, p, g, A)
+	if err != nil {
+		return nil, err
+	}
+
+	// 读取返回的B
+	b, err := readBigInt(conn)
+	if err != nil {
+		return nil, err
+	}
+
+	// 计算s
+	s := big.NewInt(0)
+	s.Exp(b, a, p)
+	key := sha256.Sum256(s.Bytes())
+	return key[:], nil
+}
+
 // Handshake 服务端dh算法握手逻辑
 func Handshake(conn io.ReadWriteCloser) ([]byte, error) {
 
@@ -49,6 +92,16 @@ func Handshake(conn io.ReadWriteCloser) ([]byte, error) {
 	s.Exp(a, b, p)
 	key := sha256.Sum256(s.Bytes())
 	return key[:], nil
+}
+
+func writeBigInts(conn io.ReadWriteCloser, is ...*big.Int) error {
+	for _, i := range is {
+		buff := i.Bytes()
+		if err := writeBytes(conn, buff); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func writeBigInt(conn io.ReadWriteCloser, i *big.Int) error {

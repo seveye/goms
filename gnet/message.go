@@ -6,7 +6,6 @@ import (
 	"encoding/binary"
 	"errors"
 	"io"
-	"log"
 
 	"github.com/seveye/goms/util"
 	"github.com/seveye/goms/util/bytes_cache"
@@ -94,7 +93,6 @@ func ReadMessageWithKey(r *bufio.Reader, key []byte) (*Request, error) {
 	//解密
 
 	if len(key) > 0 && req.isCrypto() {
-		log.Println("解密key", string(key), len(buff))
 		req.Buff, err = util.AesDecrypt(buff, key)
 		if err != nil {
 			return nil, err

@@ -81,7 +81,7 @@ func ProtectedHandler2(ctx *routing.Context) error {
 			"code":    1,
 			"codeMsg": err.Error(),
 		})
-		util.Info("JsonCall失败", "err", err)
+		util.Info("JsonCall失败", "api", serviceMethon, "remote", remote, "url", urlStr, "err", err)
 		return nil
 	}
 

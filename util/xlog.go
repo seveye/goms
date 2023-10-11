@@ -128,6 +128,10 @@ func GosLogInit(name, path string, screen bool, level int, params ...LogParam) {
 	}()
 }
 
+func SetLogLevel(level int) {
+	defaultLog.Level = level
+}
+
 func getLogTime() string {
 	return time.Now().Format("2006-01-02")
 }
